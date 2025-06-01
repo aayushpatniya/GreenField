@@ -1,6 +1,24 @@
 import Vue from "vue";
 import Vuex from "vuex";
 Vue.use(Vuex);
+
+// Helper function to get initial dark mode state from localStorage
+const getInitialDarkMode = () => {
+  try {
+    const storedValue = localStorage.getItem('isDarkMode');
+    if (storedValue) {
+      const parsedValue = JSON.parse(storedValue);
+      if (typeof parsedValue === 'boolean') {
+        return parsedValue;
+      }
+    }
+  } catch (error) {
+    console.error("Error parsing isDarkMode from localStorage:", error);
+    // Fall through to default if error
+  }
+  return false; // Default to false
+};
+
 export const store = new Vuex.Store({
     state: {
       catagory : ['Chinese','South Indian','Snacks','Main Course','Chapati','Sweets'],
@@ -53,7 +71,8 @@ export const store = new Vuex.Store({
       ],
       placedItems : [],
       selectedCatagory:'',
-      user:{}
+      user:{},
+      isDarkMode: getInitialDarkMode()
     },
     mutations: {
         addItemToPlacedItems(state, payload){
@@ -68,6 +87,14 @@ export const store = new Vuex.Store({
                 state.placedItems.push(payload);
             }
             //console.log('in store--------',state.placedItems);
+        },
+        toggleDarkMode(state) {
+          state.isDarkMode = !state.isDarkMode;
+          try {
+            localStorage.setItem('isDarkMode', JSON.stringify(state.isDarkMode));
+          } catch (error) {
+            console.error("Error saving isDarkMode to localStorage:", error);
+          }
         }
     }
 });

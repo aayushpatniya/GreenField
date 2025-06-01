@@ -13,7 +13,8 @@
             <ul class="nav navbar-nav">
                 <li  @click="activate(1)" :class="{ active : active_el == 1 }"><router-link to="/home">Home</router-link></li>
                 <li v-if="Object.keys(user).length" @click="activate(2)" :class="{ active : active_el == 2 }"><router-link to="/order">Order</router-link></li>
-                <li v-if="Object.keys(user).length" @click="activate(3)" :class="{ active : active_el == 3 }"><router-link to="/cart">Cart</router-link></li> 
+                <li v-if="Object.keys(user).length" @click="activate(3)" :class="{ active : active_el == 3 }"><router-link to="/cart">Cart</router-link></li>
+                <li><button class="btn navbar-btn" @click="toggleDarkModeHandler">Toggle Dark Mode</button></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" v-if="!Object.keys(user).length">
                 <li @click="activate(4)" :class="{ active : active_el == 4 }"><router-link to="/signUp">
@@ -99,6 +100,9 @@ export default {
     methods:{
         activate:function(el){
             this.active_el = el;
+        },
+        toggleDarkModeHandler() {
+          this.$store.commit('toggleDarkMode');
         },
         logOut(){
             this.$store.state.user = {};
