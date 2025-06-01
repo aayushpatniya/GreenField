@@ -1,0 +1,66 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - master # Or 'main' depending on your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Or a version compatible with your Vue CLI version
+
+      - name: Install dependencies
+        run: npm install
+
+      # An alternative to installing dependencies and building locally before deploying
+      # is to let Vercel handle the build. The amondnet/vercel-action can do this.
+      # If you prefer Vercel to handle the build, you might not need the 'Install Node.js'
+      # and 'Install dependencies' steps if the action handles it.
+      # However, explicit installation and build can be good for caching or more control.
+
+      # - name: Build project # Optional: Vercel can also build it.
+      #   run: npm run build
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20 # Or the official Vercel action if preferred/available
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # Optional: Specify working directory if your Vue app is not at the root
+          # working-directory: ./
+          # Optional: Vercel CLI arguments, if needed
+          # vercel-args: '--prod' # Deploys to production
+          # By default, this action usually deploys to a preview environment.
+          # To deploy to production, you might need to ensure the ref is 'refs/heads/master'
+          # and potentially add '--prod' to vercel-args or use specific action settings.
+          # For this setup, we'll rely on Vercel's GitHub integration to promote to production
+          # from the master branch, or use vercel-args if direct production deployment is needed.
+
+# Note on deploying to production:
+# The amondnet/vercel-action might deploy to a preview URL by default.
+# For production deploys on merge/push to master, Vercel's own GitHub integration
+# is often configured directly in the Vercel project settings to link to the GitHub repo.
+# If using this action for production, you might need to pass a '--prod' flag via 'vercel-args'
+# or ensure the Vercel project settings are configured for production deployments from 'master'.
+# For simplicity, this workflow assumes Vercel project settings will handle production promotion.
+# Alternatively, to force a production build with this action for the 'master' branch:
+#
+#      - name: Deploy to Vercel Production
+#        if: github.ref == 'refs/heads/master' # Ensure this is your production branch
+#        uses: amondnet/vercel-action@v20
+#        with:
+#          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+#          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+#          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+#          vercel-args: '--prod'
+#
+# Choose the appropriate deployment strategy. For now, the simpler non-explicit prod version is included.
